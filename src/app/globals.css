@@ -2,9 +2,9 @@
 
 @theme {
   /* Body text: Inter (loaded via next/font in layout) */
-  --font-family-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   /* Title text: Helvetica */
-  --font-family-heading: Helvetica, Arial, sans-serif;
+  --font-heading: "Helvetica", Arial, sans-serif;
 
   /* Brand colors */
   --color-brand-primary: #EB0028;
@@ -13,7 +13,10 @@
   --color-success: #00CA6E;
   --color-gray-1: #111111;
   --color-gray-2: #191919;
+  --color-gray-6: #F2F2F2;
+  --color-gray-9: #6E6E6E;
   --color-gray-11: #B3B3B3;
+  --color-gray-12: #EEEEEE;
 }
 
 /* Titles use Helvetica */

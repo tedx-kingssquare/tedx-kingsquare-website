@@ -28,20 +28,14 @@ const CORE_VALUES = [
 ];
 
 const SPEAKERS = [
-  { name: "Speaker One", role: "CEO, Company Name", image: "" },
-  { name: "Speaker Two", role: "Professor, University", image: "" },
-  { name: "Speaker Three", role: "Entrepreneur", image: "" },
-  { name: "Speaker Four", role: "Artist & Advocate", image: "" },
-  { name: "Speaker Five", role: "Tech Leader", image: "" },
-  { name: "Speaker Six", role: "Healthcare Pioneer", image: "" },
-  { name: "Speaker Seven", role: "Education Innovator", image: "" },
-  { name: "Speaker Eight", role: "Community Builder", image: "" },
-];
-
-const STATS = [
-  { value: "50+", label: "Speakers" },
-  { value: "100+", label: "Attendees" },
-  { value: "100K+", label: "Views" },
+  { name: "Efe Omoregie", role: "Policy Analyst", image: "/speaker_1.png" },
+  { name: "Michael Adeyemi", role: "Startup Mentor", image: "/speaker_2.png" },
+  { name: "Rachel Mensah", role: "Women Advocate", image: "/speaker_3.png" },
+  { name: "Helen Parker", role: "Social Strategist", image: "/speaker_4.png" },
+  { name: "Zainab Yusuf", role: "CEO, CivicTech Hub", image: "/speaker_5.png" },
+  { name: "Daniel Kings", role: "Health Advocate", image: "/speaker_6.png" },
+  { name: "Zainab Lawal", role: "Community Analyst", image: "/speaker_7.png" },
+  { name: "Ifeoma Okafor", role: "Community Advocate", image: "/speaker_8.png" },
 ];
 
 const CARD_GAP = 24;
@@ -83,14 +77,21 @@ function CoreValuesCarousel() {
   const cards = [...CORE_VALUES, ...CORE_VALUES, ...CORE_VALUES];
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
+    <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] w-full">
       <div
         ref={scrollRef}
-        className="overflow-x-auto overflow-y-hidden scrollbar-hide"
-        style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+        className="overflow-x-scroll overflow-y-hidden scrollbar-hide w-full min-w-0"
+        style={{
+          scrollSnapType: "x mandatory",
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-x",
+        }}
         aria-label="Core values carousel"
       >
-        <div className="flex gap-6 w-max">
+        <div
+          className="flex gap-6 flex-nowrap"
+          style={{ width: "max-content", minWidth: "max-content" }}
+        >
         {cards.map((item, i) => (
           <div
             key={`${item.title}-${i}`}
@@ -101,7 +102,7 @@ function CoreValuesCarousel() {
               <item.Icon className="w-6 h-6 text-brand-white" aria-hidden />
             </div>
             <h3 className="font-heading font-bold text-gray-1 text-lg mb-2 shrink-0">{item.title}</h3>
-            <p className="font-sans text-gray-2 text-sm leading-relaxed flex-1">{item.description}</p>
+            <p className="font-heading text-gray-2 text-sm leading-relaxed flex-1">{item.description}</p>
           </div>
         ))}
         </div>
@@ -174,7 +175,7 @@ export default function Home() {
                 </p>
               </div>
               <button
-                className="inline-flex items-center justify-center mt-[29px] w-[96px] h-[48px] rounded-md bg-brand-white text-gray-1 font-['Helvetica']! text-[16px] leading-[24px] font-medium tracking-[0.5%] border border-gray-11 hover:opacity-90 transition"
+                className="inline-flex items-center justify-center mt-[29px] w-[96px] h-[48px] rounded-md bg-brand-white text-gray-1 font-['Helvetica']! text-[16px] leading-[24px] font-medium tracking-[-0.5%] border border-gray-11 hover:opacity-90 transition"
               >
                 Learn more
               </button>
@@ -183,7 +184,7 @@ export default function Home() {
         </section>
 
         {/* Core Value */}
-        <section className="py-[96px] bg-[#F5F5F5] overflow-hidden">
+        <section className="py-[96px] bg-[#F5F5F5]">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-1 text-center">
               Our Core Values
@@ -193,99 +194,111 @@ export default function Home() {
         </section>
 
         {/* Event Details */}
-        <section id="events" className="py-16 md:py-24 bg-white">
+        <section id="events" className="py-[96px] bg-white">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">
               Event Details
             </h2>
-            <div className="grid md:grid-cols-2 gap-10 items-center">
-              <div className="rounded-xl overflow-hidden shadow-md bg-gray-200 aspect-video">
-                <img
-                  src="https://placehold.co/800x450/374151/9ca3af?text=Event+Stage"
-                  alt="TEDx event stage placeholder"
-                  className="w-full h-full object-cover"
+            <div className="grid md:grid-cols-2 gap-[80px] items-center">
+              <div className="relative rounded-xl overflow-hidden shadow-md w-[600px] h-[600px] max-w-full mx-auto md:mx-0">
+                <Image
+                  src="/event.webp"
+                  alt="TEDx Kings Square Women event"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 600px"
                 />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                <h3 className="max-w-[416px] text-[32px] leading-[40px] font-medium text-gray-900 tracking-[-0.5%] mb-[40px]">
                   Join us at{" "}
-                  <span className="text-red-600">TEDx</span> Kings Square Women – Unscripted 2026
+                  <span className="text-brand-primary">TEDx</span> Kings Square Women- Unscripted 2026
                 </h3>
-                <ul className="space-y-4 text-gray-600 mb-6">
-                  <li className="flex items-center gap-3">
-                    <span className="text-red-600 text-xl">📅</span>
-                    Saturday, 8th Nov. 2026
+                <ul className="space-y-6">
+                  <li className="flex items-start gap-3">
+                    <span className="w-12 h-12 rounded-full bg-gray-6 flex items-center justify-center shrink-0">
+                      <img src="/date.png" alt="" className="w-[20px] h-[20px] object-contain" aria-hidden />
+                    </span>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1 font-heading">Date</p>
+                      <p className="text-gray-900 font-heading font-medium text-[20px] leading-[28px]">Saturday, 15th March, 2026</p>
+                    </div>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-red-600 text-xl">🕐</span>
-                    9 AM – 5 PM
+                  <li className="flex items-start gap-3">
+                    <span className="w-12 h-12 rounded-full bg-gray-6 flex items-center justify-center shrink-0">
+                      <img src="/time.png" alt="" className="w-[20px] h-[20px] object-contain" aria-hidden />
+                    </span>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1 font-heading">Time</p>
+                      <p className="text-gray-900 font-heading font-medium text-[20px] leading-[28px]">10:00 AM - 6:00 PM</p>
+                    </div>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-red-600 text-xl">📍</span>
-                    Civic Center, Onitsha
+                  <li className="flex items-start gap-3">
+                    <span className="w-12 h-12 rounded-full bg-gray-6 flex items-center justify-center shrink-0">
+                      <img src="/location.png" alt="" className="w-[20px] h-[20px] object-contain" aria-hidden />
+                    </span>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1 font-heading">Venue</p>
+                      <p className="text-gray-900 font-heading font-medium text-[20px] leading-[28px]">Benin City, Edo State</p>
+                    </div>
                   </li>
                 </ul>
-                <a
-                  href="#register"
-                  className="inline-block bg-red-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-red-700 transition"
-                >
-                  Register Now
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Why TEDx - Stats */}
-        <section className="py-16 md:py-20 bg-gray-50">
-          <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-10">
-              Why TEDx Kings Square Women?
-            </h2>
-            <div className="rounded-xl overflow-hidden shadow-md bg-gray-200 aspect-video max-w-3xl mx-auto mb-10">
-              <img
-                src="https://placehold.co/900x500/374151/9ca3af?text=Why+Attend"
-                alt="Why attend TEDx placeholder"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-              {STATS.map((stat) => (
-                <div key={stat.label}>
-                  <div className="text-4xl md:text-5xl font-bold text-gray-900">{stat.value}</div>
-                  <div className="text-gray-600 mt-1">{stat.label}</div>
+                <div className="flex flex-wrap gap-[60px] mt-[80px]">
+                  <a
+                    href="#register"
+                    className="inline-block bg-brand-primary text-brand-white px-6 py-3 rounded-md font-semibold hover:opacity-90 transition"
+                  >
+                    Get Your Ticket
+                  </a>
+                  <a
+                    href="#about"
+                    className="inline-block bg-brand-white text-gray-900 px-6 py-3 rounded-md font-semibold border border-gray-300 hover:bg-gray-50 transition"
+                  >
+                    Learn more
+                  </a>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Featured Speakers */}
-        <section id="speakers" className="py-16 md:py-24 bg-gray-100">
+        <section id="speakers" className="py-16 md:py-24 bg-gray-12">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">
+            <h2 className="font-heading text-[40px] leading-[48px] font-bold text-brand-black text-center mb-16 md:mb-20">
               Featured Speakers
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               {SPEAKERS.map((speaker) => (
                 <div
                   key={speaker.name}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center"
+                  className="bg-white rounded-xl overflow-hidden text-center h-[438px] flex flex-col border border-[#C1C1C1]"
                 >
-                  <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full bg-gray-300 mb-3 overflow-hidden">
-                    <img
-                      src={`https://placehold.co/112x112/9ca3af/6b7280?text=${encodeURIComponent(speaker.name.slice(0, 2))}`}
+                  <div className="w-full flex-1 min-h-0 relative bg-gray-200">
+                    <Image
+                      src={speaker.image}
                       alt={speaker.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   </div>
-                  <h3 className="font-bold text-gray-900 text-sm md:text-base">{speaker.name}</h3>
-                  <p className="text-gray-600 text-xs md:text-sm">{speaker.role}</p>
+                  <div className="p-4 shrink-0">
+                    <h3 className="font-sans font-semibold text-[16px] lg:text-[16px] text-brand-black mb-2">
+                      {speaker.name}
+                    </h3>
+                    <p className="font-sans text-[14px] text-gray-9">
+                      {speaker.role}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="text-center mt-10">
-              <a href="#speakers" className="text-red-600 font-semibold hover:underline">
+            <div className="text-center mt-12 md:mt-14">
+              <a
+                href="#speakers"
+                className="font-sans font-medium text-[24px] text-brand-primary hover:underline"
+              >
                 View All Speakers
               </a>
             </div>
@@ -339,56 +352,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Contact / Question */}
-        <section id="contact" className="py-16 md:py-20 bg-white">
-          <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Got a question? We&apos;re here to help!
-            </h2>
-            <p className="text-gray-600 mb-8">
-              Whether you want to speak, partner, or simply learn more about the event, reach out
-              and we&apos;ll get back to you as soon as we can.
-            </p>
-            <a
-              href="mailto:hello@tedxkingssquarewomen.com"
-              className="inline-block bg-red-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-red-700 transition"
-            >
-              Contact Us
-            </a>
-          </div>
-        </section>
-
-        {/* Newsletter */}
-        <section className="py-16 md:py-20 bg-gray-100">
-          <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Stay up to date with the latest news
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Subscribe to our newsletter for event updates, speaker announcements, and more.
-            </p>
-            <form
-              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <input
-                type="email"
-                placeholder="Enter your email here"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="bg-red-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-red-700 transition whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </section>
-
         <Footer />
       </main>
     </div>
