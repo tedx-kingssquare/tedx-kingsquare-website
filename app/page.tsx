@@ -44,40 +44,49 @@ const STATS = [
   { value: "100K+", label: "Views" },
 ];
 
+const CARD_GAP = 24;
+
 function CoreValuesCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const cardWidthRef = useRef(0);
+  const isResettingRef = useRef(false);
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const card = el.querySelector("[data-card]");
-    if (card) cardWidthRef.current = (card as HTMLElement).offsetWidth;
-  }, []);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const getSetWidth = () => {
+      const firstCard = el.querySelector("[data-card]") as HTMLElement | null;
+      const cardWidth = firstCard?.offsetWidth ?? 320;
+      return cardWidth * CORE_VALUES.length + CARD_GAP * (CORE_VALUES.length - 1);
+    };
+
     const onScroll = () => {
-      const cardWidth = cardWidthRef.current;
-      if (!cardWidth) return;
-      const gap = 24;
-      const setWidth = cardWidth * CORE_VALUES.length + gap * (CORE_VALUES.length - 1);
+      if (isResettingRef.current) return;
+      const setWidth = getSetWidth();
+      if (setWidth <= 0) return;
       if (el.scrollLeft >= setWidth - 1) {
-        el.scrollLeft = 0;
+        isResettingRef.current = true;
+        el.style.scrollBehavior = "auto";
+        const n = Math.floor(el.scrollLeft / setWidth);
+        el.scrollLeft -= n * setWidth;
+        requestAnimationFrame(() => {
+          el.style.scrollBehavior = "";
+          isResettingRef.current = false;
+        });
       }
     };
+
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
-  const cards = [...CORE_VALUES, ...CORE_VALUES];
+  const cards = [...CORE_VALUES, ...CORE_VALUES, ...CORE_VALUES];
 
   return (
     <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
       <div
         ref={scrollRef}
-        className="overflow-x-auto overflow-y-hidden scroll-smooth scrollbar-hide"
+        className="overflow-x-auto overflow-y-hidden scrollbar-hide"
         style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
         aria-label="Core values carousel"
       >
@@ -86,13 +95,13 @@ function CoreValuesCarousel() {
           <div
             key={`${item.title}-${i}`}
             data-card
-            className="flex-shrink-0 w-full min-w-[280px] max-w-[320px] rounded-xl bg-white p-6 snap-start"
+            className="flex-shrink-0 w-[280px] md:w-[320px] rounded-xl bg-white p-8 snap-start text-center flex flex-col"
           >
-            <div className="w-12 h-12 rounded-full bg-brand-primary flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-full bg-brand-primary flex items-center justify-center mb-4 mx-auto shrink-0">
               <item.Icon className="w-6 h-6 text-brand-white" aria-hidden />
             </div>
-            <h3 className="font-heading font-bold text-gray-1 text-lg mb-2">{item.title}</h3>
-            <p className="font-sans text-gray-2 text-sm leading-relaxed">{item.description}</p>
+            <h3 className="font-heading font-bold text-gray-1 text-lg mb-2 shrink-0">{item.title}</h3>
+            <p className="font-sans text-gray-2 text-sm leading-relaxed flex-1">{item.description}</p>
           </div>
         ))}
         </div>
@@ -177,7 +186,7 @@ export default function Home() {
         <section className="py-[96px] bg-[#F5F5F5] overflow-hidden">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-1 text-center">
-              Our Core Value
+              Our Core Values
             </h2>
           </div>
           <CoreValuesCarousel />
