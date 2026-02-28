@@ -91,7 +91,7 @@ function CoreValuesCarousel() {
           <div
             key={`${item.title}-${i}`}
             data-card
-            className="flex-shrink-0 w-full min-w-[280px] max-w-[320px] rounded-xl bg-white p-6 shadow-[0_4px_14px_rgba(0,0,0,0.08)] snap-start"
+            className="flex-shrink-0 w-full min-w-[280px] max-w-[320px] rounded-xl bg-white p-6 snap-start"
           >
             <div className="w-12 h-12 rounded-full bg-brand-primary flex items-center justify-center mb-4">
               <item.Icon className="w-6 h-6 text-brand-white" aria-hidden />
@@ -255,7 +255,7 @@ export default function Home() {
         </section>
 
         {/* Core Value */}
-        <section className="py-16 md:py-24 bg-[#F5F5F5] overflow-hidden">
+        <section className="py-[96px] bg-[#F5F5F5] overflow-hidden">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-1 text-center">
               Our Core Value
