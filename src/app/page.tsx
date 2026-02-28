@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { WandSparkles, SquaresIntersect, Waves } from "lucide-react";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const CORE_VALUES = [
   {
