@@ -3,13 +3,8 @@
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { WandSparkles, SquaresIntersect, Waves } from "lucide-react";
-
-const NAV_LINKS = [
-  { label: "Home", href: "#", active: true },
-  { label: "About", href: "#about", active: false },
-  { label: "Event", href: "#events", active: false },
-  { label: "Contact", href: "#contact", active: false },
-];
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 const CORE_VALUES = [
   {
@@ -107,87 +102,11 @@ function CoreValuesCarousel() {
 }
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [email, setEmail] = useState("");
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white">
-        <div className="relative max-w-[1440px] mx-auto px-6 md:px-[100px]">
-          <div className="flex items-center justify-between py-4">
-            {/* Left: Logo */}
-            <a href="#" className="flex items-center shrink-0">
-              <img
-                src="/logo-black.png"
-                alt="TEDx Kings Square Women"
-                className="h-9 md:h-10 w-auto object-contain"
-              />
-            </a>
-
-            {/* Center: Nav links (desktop) */}
-            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-10">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className={`font-sans text-base font-normal transition ${
-                    link.active
-                      ? "text-brand-primary"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-
-            {/* Right: CTA + mobile menu */}
-            <div className="flex items-center gap-3">
-              <a
-                href="#register"
-                className="bg-red-600 text-white px-5 py-2.5 rounded-md text-[15px] font-normal hover:bg-red-700 hover:shadow-[0_2px_8px_rgba(230,43,30,0.35)] transition"
-              >
-                Get Ticket
-              </a>
-              <button
-                type="button"
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
-                aria-label="Toggle menu"
-                aria-expanded={menuOpen}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {menuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white px-6 md:px-[100px] py-4 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className={`py-3 font-sans text-base font-normal ${
-                  link.active ? "text-brand-primary" : "text-gray-600"
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </header>
-
+      <Navbar />
       <main className="flex-1">
         {/* Hero */}
         <section className="relative min-h-[70vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden">
@@ -461,71 +380,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="bg-gray-900 text-gray-300">
-          <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] py-12 md:py-16">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-              <div className="md:col-span-2">
-                <a href="#" className="inline-block mb-4">
-                  <img
-                    src="/logo-white.png"
-                    alt="TEDx Kings Square Women"
-                    className="h-8 md:h-9 w-auto object-contain"
-                  />
-                </a>
-                <p className="text-sm text-gray-400 max-w-md">
-                  An independently organized TED event bringing together ideas and voices from our
-                  community. Unscripted 2026.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-white mb-3">About Us</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><a href="#about" className="hover:text-white transition">About</a></li>
-                  <li><a href="#speakers" className="hover:text-white transition">Speakers</a></li>
-                  <li><a href="#events" className="hover:text-white transition">Events</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-white mb-3">Connect</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><a href="#contact" className="hover:text-white transition">Contact</a></li>
-                  <li><a href="#partners" className="hover:text-white transition">Partners</a></li>
-                </ul>
-                <div className="flex gap-4 mt-4">
-                  <a href="#" className="text-gray-400 hover:text-white" aria-label="Facebook">f</a>
-                  <a href="#" className="text-gray-400 hover:text-white" aria-label="Twitter">𝕏</a>
-                  <a href="#" className="text-gray-400 hover:text-white" aria-label="Instagram">ig</a>
-                  <a href="#" className="text-gray-400 hover:text-white" aria-label="LinkedIn">in</a>
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-gray-500">
-                © 2026 TEDx Kings Square Women. All rights reserved.
-              </p>
-              <div className="flex gap-3">
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition"
-                >
-                  Get Tickets
-                </a>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="inline-flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition"
-                  aria-label="Back to top"
-                >
-                  <span>↑</span> Back to Top
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </main>
     </div>
   );
