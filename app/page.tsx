@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, MessageCircle, Waves, Brain } from "lucide-react";
+import { WandSparkles, SquaresIntersect, Waves } from "lucide-react";
 
 const NAV_LINKS = [
   { label: "Home", href: "#", active: true },
@@ -16,25 +16,19 @@ const CORE_VALUES = [
     title: "Ideas That Inspire",
     description:
       "Thought-provoking ideas designed to spark curiosity, challenge perspectives, and inspire new ways of thinking.",
-    Icon: Sparkles,
+    Icon: WandSparkles,
   },
   {
     title: "Meaningful Exchange",
     description:
       "A space for ideas to meet encouraging dialogue, shared perspectives that continue beyond the stage.",
-    Icon: MessageCircle,
+    Icon: SquaresIntersect,
   },
   {
     title: "Ideas worth Spreading",
     description:
       "Powerful insights with the potential to influence, resonate, and create lasting impact within and beyond the community.",
     Icon: Waves,
-  },
-  {
-    title: "Ideas That Connect",
-    description:
-      "A space for encouraging dialogue and shared perspectives that continue beyond the stage.",
-    Icon: Brain,
   },
 ];
 
@@ -97,7 +91,7 @@ function CoreValuesCarousel() {
           <div
             key={`${item.title}-${i}`}
             data-card
-            className="flex-shrink-0 w-full max-w-[320px] rounded-xl bg-white p-6 shadow-[0_4px_14px_rgba(0,0,0,0.08)] snap-start"
+            className="flex-shrink-0 w-full min-w-[280px] max-w-[320px] rounded-xl bg-white p-6 shadow-[0_4px_14px_rgba(0,0,0,0.08)] snap-start"
           >
             <div className="w-12 h-12 rounded-full bg-brand-primary flex items-center justify-center mb-4">
               <item.Icon className="w-6 h-6 text-brand-white" aria-hidden />
