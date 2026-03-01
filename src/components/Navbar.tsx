@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { label: "Home", href: "/", id: "home" },
   { label: "About", href: "/#about", id: "about" },
   { label: "Event", href: "/event", id: "event" },
-  { label: "Contact", href: "/#contact", id: "contact" },
+  { label: "Contact", href: "/contact", id: "contact" },
 ];
 
 type NavbarProps = { activePage?: "home" | "about" | "event" | "contact" };
@@ -21,7 +21,7 @@ export default function Navbar({ activePage: activePageProp }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuIconError, setMenuIconError] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const activePage = activePageProp ?? (pathname === "/event" ? "event" : "home");
+  const activePage = activePageProp ?? (pathname === "/event" ? "event" : pathname === "/contact" ? "contact" : "home");
 
   useEffect(() => {
     const header = headerRef.current;
@@ -52,9 +52,8 @@ export default function Navbar({ activePage: activePageProp }: NavbarProps) {
               <Link
                 key={link.label}
                 href={link.href}
-                className={`font-sans text-base font-normal transition ${
-                  activePage === link.id ? "text-brand-primary" : "text-gray-600 hover:text-gray-900"
-                }`}
+                className={`font-sans text-base font-normal transition ${activePage === link.id ? "text-brand-primary" : "text-gray-600 hover:text-gray-900"
+                  }`}
               >
                 {link.label}
               </Link>
@@ -136,9 +135,8 @@ export default function Navbar({ activePage: activePageProp }: NavbarProps) {
                     key={link.label}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`py-4 font-sans text-base font-normal text-gray-900 ${
-                      activePage === link.id ? "text-brand-primary font-medium" : "hover:text-brand-primary"
-                    }`}
+                    className={`py-4 font-sans text-base font-normal text-gray-900 ${activePage === link.id ? "text-brand-primary font-medium" : "hover:text-brand-primary"
+                      }`}
                   >
                     {link.label}
                   </Link>
