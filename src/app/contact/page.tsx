@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const INQUIRY_TYPES = [
     "General Inquiry",
@@ -23,6 +27,41 @@ export default function ContactPage() {
     });
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const headingRef = useRef<HTMLHeadingElement>(null);
+    const subtitleRef = useRef<HTMLParagraphElement>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+
+    useEffect(() => {
+        const heading = headingRef.current;
+        const subtitle = subtitleRef.current;
+        const form = formRef.current;
+        if (!heading || !subtitle || !form) return;
+
+        const ctx = gsap.context(() => {
+            // Heading + subtitle entrance
+            const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+            tl.fromTo(heading, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.65 })
+                .fromTo(subtitle, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.4");
+
+            // Stagger each field group
+            const fields = form.querySelectorAll("[data-field]");
+            gsap.fromTo(
+                fields,
+                { opacity: 0, y: 28 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.55,
+                    stagger: 0.1,
+                    ease: "power2.out",
+                    delay: 0.35,
+                }
+            );
+        });
+
+        return () => ctx.revert();
+    }, [submitted]);
 
     const validate = () => {
         const newErrors: Record<string, string> = {};
@@ -61,6 +100,8 @@ export default function ContactPage() {
         setSubmitted(true);
     };
 
+    const inputBase = "w-full h-[48px] px-4 rounded-md border font-heading text-[15px] leading-[22px] text-gray-1 placeholder-gray-11 bg-white outline-none transition-all duration-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary";
+
     return (
         <div className="min-h-screen flex flex-col bg-white">
             <Navbar activePage="contact" />
@@ -69,10 +110,16 @@ export default function ContactPage() {
                 <section className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px] py-16 md:py-24">
                     {/* Header */}
                     <div className="mb-10 md:mb-12">
-                        <h1 className="font-heading font-bold text-brand-black text-[32px] md:text-[40px] leading-[40px] md:leading-[48px] text-center mb-3">
+                        <h1
+                            ref={headingRef}
+                            className="font-heading font-bold text-brand-black text-[32px] md:text-[40px] leading-[40px] md:leading-[48px] text-center mb-3"
+                        >
                             Get in Touch
                         </h1>
-                        <p className="font-heading text-gray-8 text-[16px] md:text-[18px] leading-[24px] md:leading-[26px] text-center">
+                        <p
+                            ref={subtitleRef}
+                            className="font-heading text-gray-8 text-[16px] md:text-[18px] leading-[24px] md:leading-[26px] text-center"
+                        >
                             We&apos;d love to hear from you. Reach out about tickets, partnerships, or speaking opportunities.
                         </p>
                     </div>
@@ -100,16 +147,14 @@ export default function ContactPage() {
                         </div>
                     ) : (
                         <form
+                            ref={formRef}
                             onSubmit={handleSubmit}
                             noValidate
                             className="max-w-[530px] mx-auto flex flex-col gap-5"
                         >
                             {/* Full name */}
-                            <div className="flex flex-col gap-1.5">
-                                <label
-                                    htmlFor="fullName"
-                                    className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium"
-                                >
+                            <div data-field className="flex flex-col gap-1.5">
+                                <label htmlFor="fullName" className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
                                     Full name
                                 </label>
                                 <input
@@ -119,8 +164,7 @@ export default function ContactPage() {
                                     placeholder="Enter full name"
                                     value={form.fullName}
                                     onChange={handleChange}
-                                    className={`w-full h-[48px] px-4 rounded-md border font-heading text-[15px] leading-[22px] text-gray-1 placeholder-gray-11 bg-white outline-none transition focus:border-brand-primary ${errors.fullName ? "border-brand-primary" : "border-gray-11"
-                                        }`}
+                                    className={`${inputBase} ${errors.fullName ? "border-brand-primary ring-2 ring-brand-primary/20" : "border-gray-11"}`}
                                 />
                                 {errors.fullName && (
                                     <p className="text-brand-primary text-[12px] font-heading">{errors.fullName}</p>
@@ -128,11 +172,8 @@ export default function ContactPage() {
                             </div>
 
                             {/* Email */}
-                            <div className="flex flex-col gap-1.5">
-                                <label
-                                    htmlFor="email"
-                                    className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium"
-                                >
+                            <div data-field className="flex flex-col gap-1.5">
+                                <label htmlFor="email" className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
                                     Email address
                                 </label>
                                 <input
@@ -142,8 +183,7 @@ export default function ContactPage() {
                                     placeholder="you@email.com"
                                     value={form.email}
                                     onChange={handleChange}
-                                    className={`w-full h-[48px] px-4 rounded-md border font-heading text-[15px] leading-[22px] text-gray-1 placeholder-gray-11 bg-white outline-none transition focus:border-brand-primary ${errors.email ? "border-brand-primary" : "border-gray-11"
-                                        }`}
+                                    className={`${inputBase} ${errors.email ? "border-brand-primary ring-2 ring-brand-primary/20" : "border-gray-11"}`}
                                 />
                                 {errors.email && (
                                     <p className="text-brand-primary text-[12px] font-heading">{errors.email}</p>
@@ -151,11 +191,8 @@ export default function ContactPage() {
                             </div>
 
                             {/* Phone */}
-                            <div className="flex flex-col gap-1.5">
-                                <label
-                                    htmlFor="phone"
-                                    className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium"
-                                >
+                            <div data-field className="flex flex-col gap-1.5">
+                                <label htmlFor="phone" className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
                                     Phone number
                                 </label>
                                 <input
@@ -165,16 +202,13 @@ export default function ContactPage() {
                                     placeholder="080 000 0000"
                                     value={form.phone}
                                     onChange={handleChange}
-                                    className="w-full h-[48px] px-4 rounded-md border border-gray-11 font-heading text-[15px] leading-[22px] text-gray-1 placeholder-gray-11 bg-white outline-none transition focus:border-brand-primary"
+                                    className={`${inputBase} border-gray-11`}
                                 />
                             </div>
 
                             {/* Inquiry type */}
-                            <div className="flex flex-col gap-1.5">
-                                <label
-                                    htmlFor="inquiryType"
-                                    className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium"
-                                >
+                            <div data-field className="flex flex-col gap-1.5">
+                                <label htmlFor="inquiryType" className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
                                     Inquiry type
                                 </label>
                                 <div className="relative">
@@ -183,8 +217,7 @@ export default function ContactPage() {
                                         name="inquiryType"
                                         value={form.inquiryType}
                                         onChange={handleChange}
-                                        className={`w-full h-[48px] px-4 pr-10 rounded-md border font-heading text-[15px] leading-[22px] bg-white outline-none appearance-none transition focus:border-brand-primary cursor-pointer ${form.inquiryType ? "text-gray-1" : "text-gray-11"
-                                            } ${errors.inquiryType ? "border-brand-primary" : "border-gray-11"}`}
+                                        className={`w-full h-[48px] px-4 pr-10 rounded-md border font-heading text-[15px] leading-[22px] bg-white outline-none appearance-none transition-all duration-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary cursor-pointer ${form.inquiryType ? "text-gray-1" : "text-gray-11"} ${errors.inquiryType ? "border-brand-primary ring-2 ring-brand-primary/20" : "border-gray-11"}`}
                                     >
                                         <option value="" disabled>Select</option>
                                         {INQUIRY_TYPES.map((type) => (
@@ -193,7 +226,6 @@ export default function ContactPage() {
                                             </option>
                                         ))}
                                     </select>
-                                    {/* Custom chevron */}
                                     <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-11">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -206,11 +238,8 @@ export default function ContactPage() {
                             </div>
 
                             {/* Message */}
-                            <div className="flex flex-col gap-1.5">
-                                <label
-                                    htmlFor="message"
-                                    className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium"
-                                >
+                            <div data-field className="flex flex-col gap-1.5">
+                                <label htmlFor="message" className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
                                     Message
                                 </label>
                                 <textarea
@@ -220,8 +249,7 @@ export default function ContactPage() {
                                     placeholder="Write a message"
                                     value={form.message}
                                     onChange={handleChange}
-                                    className={`w-full px-4 py-3 rounded-md border font-heading text-[15px] leading-[22px] text-gray-1 placeholder-gray-11 bg-white outline-none resize-none transition focus:border-brand-primary ${errors.message ? "border-brand-primary" : "border-gray-11"
-                                        }`}
+                                    className={`w-full px-4 py-3 rounded-md border font-heading text-[15px] leading-[22px] text-gray-1 placeholder-gray-11 bg-white outline-none resize-none transition-all duration-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary ${errors.message ? "border-brand-primary ring-2 ring-brand-primary/20" : "border-gray-11"}`}
                                 />
                                 {errors.message && (
                                     <p className="text-brand-primary text-[12px] font-heading">{errors.message}</p>
@@ -229,12 +257,14 @@ export default function ContactPage() {
                             </div>
 
                             {/* Submit */}
-                            <button
-                                type="submit"
-                                className="mt-1 w-full h-[48px] inline-flex items-center justify-center bg-brand-primary text-white rounded-md font-heading font-medium text-[16px] leading-[24px] hover:opacity-90 transition"
-                            >
-                                Send
-                            </button>
+                            <div data-field>
+                                <button
+                                    type="submit"
+                                    className="mt-1 w-full h-[48px] inline-flex items-center justify-center bg-brand-primary text-white rounded-md font-heading font-medium text-[16px] leading-[24px] hover:opacity-90 active:scale-[0.98] transition-all duration-150"
+                                >
+                                    Send
+                                </button>
+                            </div>
                         </form>
                     )}
                 </section>
