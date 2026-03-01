@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../../components/Navbar";
@@ -16,6 +17,159 @@ const INQUIRY_TYPES = [
     "Press & Media",
     "Other",
 ];
+
+// ── Custom Dropdown ──────────────────────────────────────────────────────────
+function CustomDropdown({
+    options,
+    value,
+    onChange,
+    placeholder = "Select",
+    hasError,
+}: {
+    options: string[];
+    value: string;
+    onChange: (val: string) => void;
+    placeholder?: string;
+    hasError?: boolean;
+}) {
+    const [open, setOpen] = useState(false);
+    const [rect, setRect] = useState<DOMRect | null>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const listRef = useRef<HTMLUListElement>(null);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
+
+    // Capture trigger position when opening
+    const handleToggle = () => {
+        if (!open && triggerRef.current) {
+            setRect(triggerRef.current.getBoundingClientRect());
+        }
+        setOpen((o) => !o);
+    };
+
+    // Update position on scroll/resize while open
+    useEffect(() => {
+        if (!open) return;
+        const update = () => {
+            if (triggerRef.current) setRect(triggerRef.current.getBoundingClientRect());
+        };
+        window.addEventListener("scroll", update, true);
+        window.addEventListener("resize", update);
+        return () => {
+            window.removeEventListener("scroll", update, true);
+            window.removeEventListener("resize", update);
+        };
+    }, [open]);
+
+    // Open / close animation
+    useEffect(() => {
+        const list = listRef.current;
+        if (!list) return;
+        if (open) {
+            gsap.fromTo(
+                list,
+                { opacity: 0, y: -8, pointerEvents: "none" },
+                { opacity: 1, y: 0, duration: 0.22, ease: "power2.out", pointerEvents: "auto" }
+            );
+        } else {
+            gsap.to(list, { opacity: 0, y: -6, duration: 0.15, ease: "power2.in", pointerEvents: "none" });
+        }
+    }, [open]);
+
+    // Close on outside click
+    useEffect(() => {
+        const onOutside = (e: MouseEvent) => {
+            const target = e.target as Node;
+            if (
+                triggerRef.current && !triggerRef.current.contains(target) &&
+                listRef.current && !listRef.current.contains(target)
+            ) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", onOutside);
+        return () => document.removeEventListener("mousedown", onOutside);
+    }, []);
+
+    // Close on Escape
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, []);
+
+    const dropdownList = rect ? (
+        <ul
+            ref={listRef}
+            role="listbox"
+            style={{
+                opacity: 0,
+                pointerEvents: "none",
+                position: "fixed",
+                top: rect.bottom + 6,
+                left: rect.left,
+                width: rect.width,
+                zIndex: 9999,
+            }}
+            className="bg-white border border-gray-11 rounded-md shadow-xl overflow-hidden py-1"
+        >
+            {options.map((option) => {
+                const selected = option === value;
+                return (
+                    <li
+                        key={option}
+                        role="option"
+                        aria-selected={selected}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => { onChange(option); setOpen(false); }}
+                        className={`flex items-center justify-between px-4 py-1.5 font-heading text-[15px] leading-[22px] cursor-pointer transition-colors duration-100 ${selected
+                            ? "text-brand-primary bg-brand-primary/5"
+                            : "text-gray-1 hover:bg-gray-12"
+                            }`}
+                    >
+                        <span>{option}</span>
+                        {selected && (
+                            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                        )}
+                    </li>
+                );
+            })}
+        </ul>
+    ) : null;
+
+    return (
+        <div className="relative">
+            {/* Trigger */}
+            <button
+                ref={triggerRef}
+                type="button"
+                onClick={handleToggle}
+                aria-haspopup="listbox"
+                aria-expanded={open}
+                className={`w-full h-[48px] px-4 pr-10 rounded-md border font-heading text-[15px] leading-[22px] bg-white outline-none transition-all duration-200 text-left cursor-pointer ${hasError
+                    ? "border-brand-primary ring-2 ring-brand-primary/20"
+                    : open
+                        ? "border-brand-primary ring-2 ring-brand-primary/20"
+                        : "border-gray-11"
+                    } ${value ? "text-gray-1" : "text-gray-11"}`}
+            >
+                {value || placeholder}
+                <span className={`pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
+                    <svg className="w-4 h-4 text-gray-11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </span>
+            </button>
+
+            {/* Portal: rendered on document.body to escape stacking contexts */}
+            {mounted && open && createPortal(dropdownList, document.body)}
+        </div>
+    );
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function ContactPage() {
     const [form, setForm] = useState({
@@ -208,30 +362,20 @@ export default function ContactPage() {
 
                             {/* Inquiry type */}
                             <div data-field className="flex flex-col gap-1.5">
-                                <label htmlFor="inquiryType" className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
+                                <label className="font-heading text-gray-1 text-[14px] leading-[20px] font-medium">
                                     Inquiry type
                                 </label>
-                                <div className="relative">
-                                    <select
-                                        id="inquiryType"
-                                        name="inquiryType"
-                                        value={form.inquiryType}
-                                        onChange={handleChange}
-                                        className={`w-full h-[48px] px-4 pr-10 rounded-md border font-heading text-[15px] leading-[22px] bg-white outline-none appearance-none transition-all duration-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary cursor-pointer ${form.inquiryType ? "text-gray-1" : "text-gray-11"} ${errors.inquiryType ? "border-brand-primary ring-2 ring-brand-primary/20" : "border-gray-11"}`}
-                                    >
-                                        <option value="" disabled>Select</option>
-                                        {INQUIRY_TYPES.map((type) => (
-                                            <option key={type} value={type} className="text-gray-1">
-                                                {type}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-11">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
-                                </div>
+                                <CustomDropdown
+                                    options={INQUIRY_TYPES}
+                                    value={form.inquiryType}
+                                    onChange={(val) => {
+                                        setForm((prev) => ({ ...prev, inquiryType: val }));
+                                        if (errors.inquiryType) {
+                                            setErrors((prev) => { const n = { ...prev }; delete n.inquiryType; return n; });
+                                        }
+                                    }}
+                                    hasError={!!errors.inquiryType}
+                                />
                                 {errors.inquiryType && (
                                     <p className="text-brand-primary text-[12px] font-heading">{errors.inquiryType}</p>
                                 )}
@@ -260,7 +404,7 @@ export default function ContactPage() {
                             <div data-field>
                                 <button
                                     type="submit"
-                                    className="mt-1 w-full h-[48px] inline-flex items-center justify-center bg-brand-primary text-white rounded-md font-heading font-medium text-[16px] leading-[24px] hover:opacity-90 active:scale-[0.98] transition-all duration-150"
+                                    className="mt-1 w-full h-[48px] inline-flex items-center justify-center bg-brand-primary text-white rounded-md font-heading font-medium text-[16px] leading-[24px] hover:opacity-90 active:scale-[0.98] transition-all duration-150 cursor-pointer"
                                 >
                                     Send
                                 </button>
