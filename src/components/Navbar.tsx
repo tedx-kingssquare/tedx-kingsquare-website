@@ -1,18 +1,24 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 
 const NAV_LINKS = [
-  { label: "Home", href: "#", active: true },
-  { label: "About", href: "#about", active: false },
-  { label: "Event", href: "#events", active: false },
-  { label: "Contact", href: "#contact", active: false },
+  { label: "Home", href: "/", id: "home" },
+  { label: "About", href: "/#about", id: "about" },
+  { label: "Event", href: "/event", id: "event" },
+  { label: "Contact", href: "/#contact", id: "contact" },
 ];
 
-export default function Navbar() {
+type NavbarProps = { activePage?: "home" | "about" | "event" | "contact" };
+
+export default function Navbar({ activePage: activePageProp }: NavbarProps) {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  const activePage = activePageProp ?? (pathname === "/event" ? "event" : "home");
 
   useEffect(() => {
     const header = headerRef.current;
@@ -31,29 +37,29 @@ export default function Navbar() {
     <header ref={headerRef} className="fixed w-full left-0 top-0 z-50 bg-white">
       <div className="relative max-w-[1440px] mx-auto px-6 md:px-[100px]">
         <div className="flex items-center justify-between py-4">
-          <a href="#" className="flex items-center shrink-0">
+          <Link href="/" className="flex items-center shrink-0">
             <img
               src="/logo-black.png"
               alt="TEDx Kings Square Women"
               className="h-9 md:h-10 w-auto object-contain"
             />
-          </a>
+          </Link>
           <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-10">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className={`font-sans text-base font-normal transition ${
-                  link.active ? "text-brand-primary" : "text-gray-600 hover:text-gray-900"
+                  activePage === link.id ? "text-brand-primary" : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <a
-              href="#register"
+            <Link
+              href={pathname === "/event" ? "/event#tickets" : "/#register"}
               className="cta-text-swap bg-red-600 text-white px-5 py-2.5 rounded-md text-[15px] font-normal hover:bg-red-700 hover:shadow-[0_2px_8px_rgba(230,43,30,0.35)] transition inline-flex items-center justify-center"
             >
               <span className="cta-text-swap__inner">
@@ -62,7 +68,7 @@ export default function Navbar() {
                   <span className="cta-text-swap__line" aria-hidden>Reserve your spot</span>
                 </span>
               </span>
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -84,14 +90,14 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-6 md:px-[100px] py-4 flex flex-col gap-1">
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.label}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className={`py-3 font-sans text-base font-normal ${link.active ? "text-brand-primary" : "text-gray-600"}`}
+              className={`py-3 font-sans text-base font-normal ${activePage === link.id ? "text-brand-primary" : "text-gray-600"}`}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
       )}

@@ -12,7 +12,7 @@ export default function Footer() {
 
   const QUICK_LINKS = [
     { label: "About", href: "#about" },
-    { label: "Event", href: "#events" },
+    { label: "Event", href: "/event" },
     { label: "Contact", href: "#contact" },
   ];
   
@@ -20,7 +20,7 @@ export default function Footer() {
     { label: "Speakers", href: "#speakers" },
     { label: "Schedule", href: "#schedule" },
     { label: "Tickets", href: "#register" },
-    { label: "Venue", href: "#events" },
+    { label: "Venue", href: "/event" },
   ];
 
   useEffect(() => {
