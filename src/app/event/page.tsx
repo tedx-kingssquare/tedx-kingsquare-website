@@ -160,8 +160,8 @@ export default function EventPage() {
       <div className="relative z-10 bg-white shadow-2xl">
         <main className="flex-1 pt-[72px] md:pt-[80px]">
           {/* Hero */}
-          <section ref={heroSectionRef} className="relative text-center pt-12 md:pt-16 pb-8 md:pb-12 overflow-hidden">
-            <div className="max-w-[1440px] mx-auto px-6">
+          <section ref={heroSectionRef} className="relative text-center pt-8 sm:pt-10 md:pt-12 lg:pt-16 pb-6 sm:pb-8 md:pb-10 lg:pb-12 overflow-hidden">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px]">
               <h1 ref={heroTitleRef} className="font-heading font-bold text-brand-black text-3xl md:text-4xl lg:text-[48px] leading-[56px] tracking-[-1%] mb-3">
                 Join us for{" "}
                 <span className="text-brand-primary text-4xl md:text-5xl lg:text-6xl">
@@ -173,7 +173,7 @@ export default function EventPage() {
               </p>
             </div>
             {/* Fixed frame so scale animation stays inside */}
-            <div className="relative mt-10 md:mt-14 w-screen left-1/2 -translate-x-1/2 h-[516px] overflow-hidden">
+            <div className="relative mt-10 md:mt-14 w-full h-[516px] overflow-hidden">
               <div
                 ref={heroImageRef}
                 className="absolute inset-0 w-full h-full origin-center"
@@ -196,7 +196,7 @@ export default function EventPage() {
           </section>
 
           {/* Event details: two columns */}
-          <section id="tickets" className="max-w-[1440px] mx-auto px-6 md:px-[100px] py-12 md:py-16">
+          <section id="tickets" className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px] py-8 sm:py-10 md:py-12 lg:py-16">
             <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
               {/* Left: theme, venue, date */}
               <div className="font-heading space-y-6">
@@ -285,7 +285,7 @@ export default function EventPage() {
           </section>
 
           {/* Theme description */}
-          <section className="max-w-[1440px] mx-auto px-6 md:px-[100px] py-8 md:py-12">
+          <section className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px] py-6 sm:py-8 md:py-10 lg:py-12">
             <p className="font-heading text-gray-2 text-[20px] leading-[28px] text-center max-w-3xl mx-auto">
               The theme &quot;<span className="text-brand-primary font-semibold">Unscripted</span>
               &quot; is a bold call for women to advance and create new possibilities in spaces where
@@ -294,8 +294,8 @@ export default function EventPage() {
           </section>
 
           {/* Speakers and Featured Topics – odd: image left, text right; even: text left, image right; red image area, contained headshot */}
-          <section ref={speakersSectionRef} className="bg-white py-16 md:py-24">
-            <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
+          <section ref={speakersSectionRef} className="bg-white py-10 sm:py-12 md:py-16 lg:py-20 xl:py-24">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px]">
               <h2 className="font-heading font-bold text-brand-black text-3xl md:text-4xl text-center mb-12 md:mb-16">
                 Speakers and Featured Topics
               </h2>
@@ -359,8 +359,8 @@ export default function EventPage() {
           </section>
 
           {/* CTA */}
-          <section className="relative z-10 py-16 md:py-24 text-center bg-white">
-            <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
+          <section className="relative z-10 py-10 sm:py-12 md:py-16 lg:py-20 xl:py-24 text-center bg-white">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px]">
               <h2 className="font-heading font-bold text-brand-black text-2xl md:text-3xl mb-8">
                 Get tickets for a life changing event.
               </h2>
