@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { gsap } from "gsap";
 
 const NAV_LINKS = [
   { label: "Home", href: "#", active: true },
@@ -11,9 +12,23 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        header,
+        { y: -16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", overwrite: true }
+      );
+    });
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white">
+    <header ref={headerRef} className="fixed w-full left-0 top-0 z-50 bg-white">
       <div className="relative max-w-[1440px] mx-auto px-6 md:px-[100px]">
         <div className="flex items-center justify-between py-4">
           <a href="#" className="flex items-center shrink-0">
@@ -39,9 +54,14 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <a
               href="#register"
-              className="bg-red-600 text-white px-5 py-2.5 rounded-md text-[15px] font-normal hover:bg-red-700 hover:shadow-[0_2px_8px_rgba(230,43,30,0.35)] transition"
+              className="cta-text-swap bg-red-600 text-white px-5 py-2.5 rounded-md text-[15px] font-normal hover:bg-red-700 hover:shadow-[0_2px_8px_rgba(230,43,30,0.35)] transition inline-flex items-center justify-center"
             >
-              Get Ticket
+              <span className="cta-text-swap__inner">
+                <span className="cta-text-swap__track">
+                  <span className="cta-text-swap__line">Get Ticket</span>
+                  <span className="cta-text-swap__line" aria-hidden>Reserve your spot</span>
+                </span>
+              </span>
             </a>
             <button
               type="button"

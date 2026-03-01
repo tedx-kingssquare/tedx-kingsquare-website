@@ -2,6 +2,10 @@
 
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 import { WandSparkles, SquaresIntersect, Waves } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -40,6 +44,9 @@ const SPEAKERS = [
 
 const CARD_GAP = 24;
 
+const AUTO_SCROLL_SPEED = 0.8; // px per tick
+const AUTO_SCROLL_INTERVAL = 20; // ms
+
 function CoreValuesCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isResettingRef = useRef(false);
@@ -71,7 +78,28 @@ function CoreValuesCarousel() {
     };
 
     el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
+
+    let paused = false;
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    el.addEventListener("mouseenter", pause);
+    el.addEventListener("mouseleave", resume);
+    el.addEventListener("focusin", pause);
+    el.addEventListener("focusout", resume);
+
+    const autoScroll = setInterval(() => {
+      if (!scrollRef.current || paused || isResettingRef.current) return;
+      el.scrollLeft += AUTO_SCROLL_SPEED;
+    }, AUTO_SCROLL_INTERVAL);
+
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("mouseenter", pause);
+      el.removeEventListener("mouseleave", resume);
+      el.removeEventListener("focusin", pause);
+      el.removeEventListener("focusout", resume);
+      clearInterval(autoScroll);
+    };
   }, []);
 
   const cards = [...CORE_VALUES, ...CORE_VALUES, ...CORE_VALUES];
@@ -82,7 +110,6 @@ function CoreValuesCarousel() {
         ref={scrollRef}
         className="overflow-x-scroll overflow-y-hidden scrollbar-hide w-full min-w-0"
         style={{
-          scrollSnapType: "x mandatory",
           WebkitOverflowScrolling: "touch",
           touchAction: "pan-x",
         }}
@@ -96,7 +123,7 @@ function CoreValuesCarousel() {
           <div
             key={`${item.title}-${i}`}
             data-card
-            className="flex-shrink-0 w-[280px] md:w-[320px] rounded-xl bg-white p-8 snap-start text-center flex flex-col"
+            className="flex-shrink-0 w-[280px] md:w-[320px] rounded-xl bg-white p-8 text-center flex flex-col"
           >
             <div className="w-12 h-12 rounded-full bg-brand-primary flex items-center justify-center mb-4 mx-auto shrink-0">
               <item.Icon className="w-6 h-6 text-brand-white" aria-hidden />
@@ -113,40 +140,280 @@ function CoreValuesCarousel() {
 
 export default function Home() {
   const [email, setEmail] = useState("");
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const heroImageRef = useRef<HTMLDivElement>(null);
+  const heroImageInnerRef = useRef<HTMLDivElement>(null);
+  const heroOverlayRef = useRef<HTMLDivElement>(null);
+  const heroTitleRef = useRef<HTMLHeadingElement>(null);
+  const heroSubtitleRef = useRef<HTMLParagraphElement>(null);
+  const heroCtaRef = useRef<HTMLAnchorElement>(null);
+  const aboutSectionRef = useRef<HTMLElement>(null);
+  const aboutContentRef = useRef<HTMLDivElement>(null);
+  const eventSectionRef = useRef<HTMLElement>(null);
+  const eventImageRef = useRef<HTMLDivElement>(null);
+  const eventContentRef = useRef<HTMLDivElement>(null);
+  const speakersSectionRef = useRef<HTMLElement>(null);
+  const partnersSectionRef = useRef<HTMLElement>(null);
+  const inspiredSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = heroSectionRef.current;
+    const image = heroImageRef.current;
+    const overlay = heroOverlayRef.current;
+    const titleEl = heroTitleRef.current;
+    const subtitle = heroSubtitleRef.current;
+    const cta = heroCtaRef.current;
+    const imageInner = heroImageInnerRef.current;
+    if (!section || !image || !imageInner || !overlay || !titleEl || !subtitle || !cta) return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+      tl.fromTo(
+        imageInner,
+        { scale: 1.08 },
+        { scale: 1.4, duration: 1.4, ease: "power2.inOut" }
+      )
+        .fromTo(
+          overlay,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.5 },
+          "-=1.4"
+        )
+        .fromTo(
+          titleEl.querySelectorAll(".hero-title-word"),
+          { yPercent: 100 },
+          {
+            yPercent: 0,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "power2.out",
+          },
+          "-=0.9"
+        )
+        .fromTo(
+          subtitle,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.6 },
+          "-=0.5"
+        )
+        .fromTo(
+          cta,
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          "-=0.4"
+        );
+
+      // Parallax: image moves less than scroll so the lag is evident; scrub adds visible delay
+      gsap.fromTo(
+        image,
+        { yPercent: 0 },
+        {
+          yPercent: -20,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "bottom top",
+            scrub: 2.5,
+          },
+        }
+      );
+    }, section);
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const section = aboutSectionRef.current;
+    const content = aboutContentRef.current;
+    if (!section || !content) return;
+    const ctx = gsap.context(() => {
+      const titles = content.querySelectorAll("h2");
+      const paragraphs = content.querySelectorAll("p");
+      const cta = content.querySelector("button");
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top 82%",
+          toggleActions: "play none none none",
+        },
+        defaults: { ease: "power2.out" },
+      });
+      tl.fromTo(titles, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.12 })
+        .fromTo(paragraphs, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.07 }, "-=0.4");
+      if (cta) {
+        tl.fromTo(cta, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3");
+      }
+    }, section);
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const section = eventSectionRef.current;
+    const imageEl = eventImageRef.current;
+    const content = eventContentRef.current;
+    if (!section || !imageEl || !content) return;
+    const ctx = gsap.context(() => {
+      const title = section.querySelector("h2");
+      const heading = content.querySelector("h3");
+      const listItems = content.querySelectorAll("ul li");
+      const ctaWrap = content.querySelector(".flex.flex-wrap");
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top 82%",
+          toggleActions: "play none none none",
+        },
+        defaults: { ease: "power2.out" },
+      });
+      if (title) tl.fromTo(title, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 });
+      tl.fromTo(imageEl, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.7 }, "-=0.4");
+      if (heading) tl.fromTo(heading, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55 }, "-=0.5");
+      if (listItems.length)
+        tl.fromTo(listItems, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.1 }, "-=0.35");
+      if (ctaWrap) tl.fromTo(ctaWrap, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.25");
+    }, section);
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const section = speakersSectionRef.current;
+    if (!section) return;
+    const ctx = gsap.context(() => {
+      const grid = section.querySelector('[class*="grid"]');
+      if (!grid) return;
+      const cards = grid.children;
+      if (!cards.length) return;
+      gsap.fromTo(
+        cards,
+        { opacity: 0, y: 32 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 82%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, section);
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const section = partnersSectionRef.current;
+    if (!section) return;
+    const ctx = gsap.context(() => {
+      const title = section.querySelector("h2");
+      const body = section.querySelector("p");
+      const cta = section.querySelector("a");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: section, start: "top 82%", toggleActions: "play none none none" },
+        defaults: { ease: "power2.out" },
+      });
+      if (title) tl.fromTo(title, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.65 });
+      if (body) tl.fromTo(body, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.55 }, "-=0.4");
+      if (cta) tl.fromTo(cta, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.35");
+    }, section);
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const section = inspiredSectionRef.current;
+    if (!section) return;
+    const ctx = gsap.context(() => {
+      const title = section.querySelector("h2");
+      const body = section.querySelector("p");
+      const ctas = section.querySelectorAll("a");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: section, start: "top 82%", toggleActions: "play none none none" },
+        defaults: { ease: "power2.out" },
+      });
+      if (title) tl.fromTo(title, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.65 });
+      if (body) tl.fromTo(body, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.55 }, "-=0.4");
+      if (ctas.length) tl.fromTo(ctas, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 }, "-=0.35");
+    }, section);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col">
       <Navbar />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative min-h-[70vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden">
-          <Image
-            src="/hero.webp"
-            alt="TEDx Kings Square Women"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-brand-black/60" />
-          <div className="relative z-10 text-center text-white px-6 mx-auto">
-            <h1 className="mx-auto text-center text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-2 lg:w-max font-heading">
-              <span className="text-brand-primary">TEDx</span> Kings Square Women
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-95">Unscripted</p>
-            <a
-              href="#about"
-              className="inline-flex items-center justify-center w-[168px] h-[48px] bg-red-600 text-white rounded-md text-[16px] font-heading font-medium hover:bg-red-700 transition"
+        <section
+          ref={heroSectionRef}
+          className="relative h-screen min-h-0 flex items-center justify-center overflow-hidden"
+        >
+          <div
+            ref={heroImageRef}
+            className="absolute top-0 left-0 right-0 w-full overflow-hidden"
+            style={{ height: "160%" }}
+          >
+            <div
+              ref={heroImageInnerRef}
+              className="absolute inset-0 origin-center will-change-transform"
+              style={{ transform: "scale(1.08)" }}
             >
-              Get Ticket
+              <Image
+                src="/hero.webp"
+                alt="TEDx Kings Square Women"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+              />
+            </div>
+          </div>
+          <div
+            ref={heroOverlayRef}
+            className="absolute inset-0 bg-brand-black/70 backdrop-blur-[5px]"
+          />
+          <div className="relative z-10 text-center text-white px-6 mx-auto">
+            <h1
+              ref={heroTitleRef}
+              className="mx-auto text-center text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-2 lg:w-max font-heading"
+            >
+              <span className="hero-title-mask">
+                <span className="hero-title-word text-brand-primary">TEDx</span>
+              </span>
+              <span className="hero-title-mask">
+                <span className="hero-title-word">Kings</span>
+              </span>
+              <span className="hero-title-mask">
+                <span className="hero-title-word">Square</span>
+              </span>
+              <span className="hero-title-mask">
+                <span className="hero-title-word">Women</span>
+              </span>
+            </h1>
+            <p
+              ref={heroSubtitleRef}
+              className="text-xl md:text-2xl mb-8 opacity-95"
+            >
+              Unscripted
+            </p>
+            <a
+              ref={heroCtaRef}
+              href="#about"
+              className="cta-text-swap inline-flex items-center justify-center w-[168px] h-[48px] bg-red-600 text-white rounded-md text-[16px] font-heading font-medium hover:bg-red-700 transition"
+            >
+              <span className="cta-text-swap__inner">
+                <span className="cta-text-swap__track">
+                  <span className="cta-text-swap__line">Get Ticket</span>
+                  <span className="cta-text-swap__line" aria-hidden>Reserve your spot</span>
+                </span>
+              </span>
             </a>
           </div>
         </section>
 
         {/* About */}
-        <section id="about" className="py-16 md:py-24 bg-white">
+        <section ref={aboutSectionRef} id="about" className="py-16 md:py-24 bg-white">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] font-heading">
-            <div>
+            <div ref={aboutContentRef}>
               <h2 className="font-heading max-w-[532px] text-3xl md:text-4xl lg:text-[40px] lg:leading-[48px] font-bold text-gray-1 tracking-[-0.1%]">
                 What is <span className="text-brand-primary">TEDx</span>
               </h2>
@@ -175,9 +442,14 @@ export default function Home() {
                 </p>
               </div>
               <button
-                className="inline-flex items-center justify-center mt-[29px] w-[96px] h-[48px] rounded-md bg-brand-white text-gray-1 font-['Helvetica']! text-[16px] leading-[24px] font-medium tracking-[-0.5%] border border-gray-11 hover:opacity-90 transition"
+                className="cta-text-swap inline-flex items-center justify-center mt-[29px] w-[96px] h-[48px] rounded-md bg-brand-white text-gray-1 font-['Helvetica']! text-[16px] leading-[24px] font-medium tracking-[-0.5%] border border-gray-11 hover:opacity-90 transition"
               >
-                Learn more
+                <span className="cta-text-swap__inner">
+                <span className="cta-text-swap__track">
+                  <span className="cta-text-swap__line">Learn more</span>
+                  <span className="cta-text-swap__line" aria-hidden>Discover more</span>
+                </span>
+              </span>
               </button>
             </div>
           </div>
@@ -194,22 +466,27 @@ export default function Home() {
         </section>
 
         {/* Event Details */}
-        <section id="events" className="py-[96px] bg-white">
+        <section ref={eventSectionRef} id="events" className="py-[96px] bg-white">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">
               Event Details
             </h2>
             <div className="grid md:grid-cols-2 gap-[80px] items-center">
-              <div className="relative rounded-xl overflow-hidden shadow-md w-[600px] h-[600px] max-w-full mx-auto md:mx-0">
-                <Image
-                  src="/event.webp"
-                  alt="TEDx Kings Square Women event"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 600px"
-                />
+              <div
+                ref={eventImageRef}
+                className="group relative rounded-xl overflow-hidden shadow-md w-[600px] h-[600px] max-w-full mx-auto md:mx-0"
+              >
+                <div className="absolute inset-0 transition-transform duration-300 ease-out scale-100 group-hover:scale-105">
+                  <Image
+                    src="/event.webp"
+                    alt="TEDx Kings Square Women event"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 600px"
+                  />
+                </div>
               </div>
-              <div>
+              <div ref={eventContentRef}>
                 <h3 className="max-w-[416px] text-[32px] leading-[40px] font-medium text-gray-900 tracking-[-0.5%] mb-[40px]">
                   Join us at{" "}
                   <span className="text-brand-primary">TEDx</span> Kings Square Women- Unscripted 2026
@@ -246,15 +523,25 @@ export default function Home() {
                 <div className="flex flex-wrap gap-[60px] mt-[80px]">
                   <a
                     href="#register"
-                    className="inline-block bg-brand-primary text-brand-white px-6 py-3 rounded-md font-semibold hover:opacity-90 transition"
+                    className="cta-text-swap inline-flex items-center justify-center bg-brand-primary text-brand-white px-6 py-3 rounded-md font-semibold hover:opacity-90 transition"
                   >
-                    Get Your Ticket
+                    <span className="cta-text-swap__inner">
+                    <span className="cta-text-swap__track">
+                      <span className="cta-text-swap__line">Get Your Ticket</span>
+                      <span className="cta-text-swap__line" aria-hidden>Reserve now</span>
+                    </span>
+                  </span>
                   </a>
                   <a
                     href="#about"
-                    className="inline-block bg-brand-white text-gray-900 px-6 py-3 rounded-md font-semibold border border-gray-300 hover:bg-gray-50 transition"
+                    className="cta-text-swap inline-flex items-center justify-center bg-brand-white text-gray-900 px-6 py-3 rounded-md font-semibold border border-gray-300 hover:bg-gray-50 transition"
                   >
-                    Learn more
+                    <span className="cta-text-swap__inner">
+                      <span className="cta-text-swap__track">
+                        <span className="cta-text-swap__line">Learn more</span>
+                        <span className="cta-text-swap__line" aria-hidden>Find out more</span>
+                      </span>
+                    </span>
                   </a>
                 </div>
               </div>
@@ -263,7 +550,7 @@ export default function Home() {
         </section>
 
         {/* Featured Speakers */}
-        <section id="speakers" className="py-16 md:py-24 bg-gray-12">
+        <section ref={speakersSectionRef} id="speakers" className="py-16 md:py-24 bg-gray-12">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
             <h2 className="font-heading text-[40px] leading-[48px] font-bold text-brand-black text-center mb-16 md:mb-20">
               Featured Speakers
@@ -297,57 +584,75 @@ export default function Home() {
             <div className="text-center mt-12 md:mt-14">
               <a
                 href="#speakers"
-                className="font-sans font-medium text-[24px] text-brand-primary hover:underline"
+                className="cta-text-swap inline-flex items-center justify-center font-sans font-medium text-[24px] text-brand-primary hover:underline"
               >
-                View All Speakers
+                <span className="cta-text-swap__inner">
+                <span className="cta-text-swap__track">
+                  <span className="cta-text-swap__line">View All Speakers</span>
+                  <span className="cta-text-swap__line" aria-hidden>See everyone</span>
+                </span>
+              </span>
               </a>
             </div>
           </div>
         </section>
 
         {/* Partnership */}
-        <section id="partners" className="py-16 md:py-24 bg-white">
-          <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Become a <span className="text-red-600">TEDx</span> Kings Square Women Partner Today
+        <section ref={partnersSectionRef} id="partners" className="py-16 md:py-24 bg-white">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-[100px]">
+            <h2 className="font-heading max-w-[618px] text-[40px] leading-[48px] font-bold text-brand-black tracking-[-0.1%] mb-6">
+              Become a <span className="text-brand-primary">TEDx</span> Kings Square Women Partner Today
             </h2>
-            <p className="text-gray-600 mb-8">
-              Partner with us to amplify ideas and support a community of innovators and
-              storytellers. Your partnership helps us create an unforgettable experience for
-              speakers and attendees alike.
+            <p className="font-heading text-[20px] leading-[28px] font-normal text-gray-2 w-full mb-8">
+              We welcome organizations and individuals who share our vision. Partner with us to
+              support this year&apos;s event and connect with a growing community of changemakers.
             </p>
             <a
               href="#contact"
-              className="inline-block bg-red-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-red-700 transition"
+              className="cta-text-swap inline-flex items-center justify-center bg-brand-primary text-brand-white px-6 py-3 rounded-md font-sans font-medium text-[16px] leading-[24px] tracking-[0.05%] hover:opacity-90 transition"
             >
-              Join Now
+              <span className="cta-text-swap__inner">
+                <span className="cta-text-swap__track">
+<span className="cta-text-swap__line">Join Partners</span>
+                <span className="cta-text-swap__line" aria-hidden>Partner with us</span>
+                </span>
+              </span>
             </a>
           </div>
         </section>
 
         {/* Ready to be Inspired */}
-        <section className="py-16 md:py-24 bg-gray-100">
+        <section ref={inspiredSectionRef} className="py-[96px] bg-gray-100">
           <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-[32px] leading-[40px] font-bold text-gray-1 mb-[32px] tracking-[-0.5%]">
               Ready to be Inspired?
             </h2>
-            <p className="text-gray-600 mb-8">
-              Join us for a day of powerful talks, meaningful connections, and ideas that could
-              change the way you see the world.
+            <p className="text-gray-8 mb-[40px] font-heading text-[20px] leading-[28px]">
+            Don't miss this opportunity to connect with extraordinary women and groundbreaking ideas.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 id="register"
                 href="#"
-                className="inline-block bg-red-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-red-700 transition text-center"
+                className="cta-text-swap inline-flex items-center justify-center bg-red-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-red-700 transition text-center text-[16px] leading-[24px] tracking-[0.05%]"
               >
-                Register Now
+                <span className="cta-text-swap__inner">
+                <span className="cta-text-swap__track">
+                  <span className="cta-text-swap__line">Get Your Ticket</span>
+                  <span className="cta-text-swap__line" aria-hidden>Reserve now</span>
+                </span>
+              </span>
               </a>
               <a
                 href="#contact"
-                className="inline-block bg-white text-red-600 border-2 border-red-600 px-8 py-3 rounded-md font-semibold hover:bg-red-50 transition text-center"
+                className="cta-text-swap inline-flex items-center justify-center bg-white text-gray-1 border border-[#B3B3B3] px-8 py-3 rounded-md font-semibold hover:bg-red-50 transition text-center text-[16px] leading-[24px] tracking-[0.05%]"
               >
-                Become a Speaker
+                <span className="cta-text-swap__inner">
+                  <span className="cta-text-swap__track">
+                    <span className="cta-text-swap__line">Join Our Community</span>
+                    <span className="cta-text-swap__line" aria-hidden>Connect now</span>
+                  </span>
+                </span>
               </a>
             </div>
           </div>

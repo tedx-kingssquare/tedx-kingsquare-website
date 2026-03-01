@@ -14,6 +14,7 @@
   --color-gray-1: #111111;
   --color-gray-2: #191919;
   --color-gray-6: #F2F2F2;
+  --color-gray-8: #606060;
   --color-gray-9: #6E6E6E;
   --color-gray-11: #B3B3B3;
   --color-gray-12: #EEEEEE;
@@ -24,6 +25,27 @@ h1, h2, h3, h4, h5, h6 {
   font-family: Helvetica, Arial, sans-serif;
 }
 
+/* Custom scrollbar: brand primary thumb, transparent track */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-brand-primary) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-brand-primary);
+  border-radius: 5px;
+  border: 2px solid transparent;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #c90022;
+}
+
 /* Hide scrollbar for carousel */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -31,4 +53,45 @@ h1, h2, h3, h4, h5, h6 {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Hero title masked stagger reveal */
+.hero-title-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.hero-title-mask + .hero-title-mask {
+  margin-left: 0.15em;
+}
+.hero-title-word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* CTA hover: text slides up, replica slides in from below; only one line visible */
+.cta-text-swap__inner {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+.cta-text-swap__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: transform 0.3s ease;
+  line-height: 1;
+}
+.cta-text-swap:hover .cta-text-swap__track {
+  transform: translateY(-50%);
+}
+.cta-text-swap__line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
