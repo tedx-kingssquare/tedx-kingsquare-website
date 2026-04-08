@@ -9,7 +9,7 @@ import { gsap } from "gsap";
 
 const NAV_LINKS = [
   { label: "Home", href: "/", id: "home" },
-  { label: "About", href: "/#about", id: "about" },
+  { label: "About", href: "/about", id: "about" },
   { label: "Event", href: "/event", id: "event" },
   { label: "Contact", href: "/contact", id: "contact" },
 ];
@@ -21,7 +21,7 @@ export default function Navbar({ activePage: activePageProp }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuIconError, setMenuIconError] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const activePage = activePageProp ?? (pathname === "/event" ? "event" : pathname === "/contact" ? "contact" : "home");
+  const activePage = activePageProp ?? (pathname === "/event" ? "event" : pathname === "/about" ? "about" : pathname === "/contact" ? "contact" : "home");
 
   useEffect(() => {
     const header = headerRef.current;
