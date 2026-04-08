@@ -91,12 +91,51 @@ export const SPEAKERS_SECTION = {
   viewAll: { primary: "View All Speakers", secondary: "See everyone", href: "#speakers" },
 };
 
+// FAQ
+export const FAQ_SECTION = {
+  title: "Frequently Asked Questions",
+  cta: { label: "Contact Us", href: "/contact" },
+};
+
+export const FAQ_ITEMS = [
+  {
+    question: "What is TEDxKings Square Women?",
+    answer:
+      "TEDxKings Square Women is a locally organized TEDx event focused on amplifying **women's voices**, ideas, and stories that inspire meaningful change.\n- Curated talks from diverse speakers\n- Real stories with practical insight\n- A community-centered experience",
+  },
+  {
+    question: "When and where will the event take place?",
+    answer:
+      "The event is scheduled for **Saturday, 15th March, 2026** in **Benin City, Edo State**.\nFull venue details are shared with registered attendees.",
+  },
+  {
+    question: "Who can attend this event?",
+    answer:
+      "The event is open to:\n- Students and young professionals\n- Founders, creators, and leaders\n- Anyone interested in **ideas worth spreading**",
+  },
+  {
+    question: "How can I register or attend?",
+    answer:
+      "You can reserve a seat through the ticket button on this website.\n- Select your ticket\n- Complete registration details\n- Receive your confirmation\n\nSpaces are limited, so **early registration is recommended**.",
+  },
+  {
+    question: "Is the event free or ticketed?",
+    answer:
+      "Attendance is **ticketed**.\nPricing and ticket tiers are listed in the event section.",
+  },
+  {
+    question: "What should I expect at the event?",
+    answer:
+      "Expect a full day of:\n- Curated TEDx talks\n- Inspiring personal stories\n- Meaningful networking\n- Conversations around **impact-driven ideas**",
+  },
+] as const;
+
 // Partnership
 export const PARTNERS_SECTION = {
   title: "Become a TEDx Kings Square Women Partner Today",
   brandName: "TEDx",
   body: "We welcome organizations and individuals who share our vision. Partner with us to support this year's event and connect with a growing community of changemakers.",
-  cta: { primary: "Join Partners", secondary: "Partner with us", href: "#contact" },
+  cta: { primary: "Join Partners", secondary: "Partner with us", href: "/contact" },
 };
 
 // Ready to be Inspired
@@ -104,7 +143,7 @@ export const INSPIRED_SECTION = {
   title: "Ready to be Inspired?",
   body: "Don't miss this opportunity to connect with extraordinary women and groundbreaking ideas.",
   ctas: [
-    { primary: "Get Your Ticket", secondary: "Reserve now", href: "#", id: "register" },
-    { primary: "Join Our Community", secondary: "Connect now", href: "#contact" },
+    { primary: "Get Your Ticket", secondary: "Reserve now", href: "/event#tickets", id: "register" },
+    { primary: "Join Our Community", secondary: "Connect now", href: "https://chat.whatsapp.com/BpjkeQJOVHK7D3zacrlVGw" },
   ],
 };
