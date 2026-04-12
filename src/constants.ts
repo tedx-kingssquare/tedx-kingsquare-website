@@ -101,32 +101,57 @@ export const FAQ_ITEMS = [
   {
     question: "What is TEDxKings Square Women?",
     answer:
-      "TEDxKings Square Women is a locally organized TEDx event focused on amplifying **women's voices**, ideas, and stories that inspire meaningful change.\n- Curated talks from diverse speakers\n- Real stories with practical insight\n- A community-centered experience",
+      "TEDxKings Square Women is an independently organized TED event that showcases women's voices, women-led innovations, and ideas worth spreading through talks that inspire action and meaningful conversations.",
   },
   {
-    question: "When and where will the event take place?",
+    question: "How is a TEDx event different from a TED Conference?",
     answer:
-      "The event is scheduled for **Saturday, 15th March, 2026** in **Benin City, Edo State**.\nFull venue details are shared with registered attendees.",
+      "TED Conferences are run by TED, while TEDx events are independently organized under a TED license, following the TED format, with the goal of sharing ideas worth spreading.",
   },
   {
-    question: "Who can attend this event?",
+    question: "Is this event only for women?",
     answer:
-      "The event is open to:\n- Students and young professionals\n- Founders, creators, and leaders\n- Anyone interested in **ideas worth spreading**",
+      "No! It's open to ALL — women, men, youths, and women allies.",
   },
   {
-    question: "How can I register or attend?",
+    question: "What age group is this for?",
     answer:
-      "You can reserve a seat through the ticket button on this website.\n- Select your ticket\n- Complete registration details\n- Receive your confirmation\n\nSpaces are limited, so **early registration is recommended**.",
+      "All ages! We believe powerful ideas have no age limit.",
   },
   {
-    question: "Is the event free or ticketed?",
+    question: "Why is it called TEDxKings Square Women?",
     answer:
-      "Attendance is **ticketed**.\nPricing and ticket tiers are listed in the event section.",
+      "Kings Square is the heart of Benin City, a central gathering place. We're creating a space where women's ideas take center stage.",
   },
   {
-    question: "What should I expect at the event?",
+    question: "Where will the event be held?",
     answer:
-      "Expect a full day of:\n- Curated TEDx talks\n- Inspiring personal stories\n- Meaningful networking\n- Conversations around **impact-driven ideas**",
+      "Benin City. Exact venue to be announced soon. Stay tuned!",
+  },
+  {
+    question: "When is the event?",
+    answer:
+      "Keep an eye on our social media for the big reveal. Coming soon!",
+  },
+  {
+    question: "How can I attend the event?",
+    answer:
+      "Tickets will be announced and made available through our website and official social media pages.",
+  },
+  {
+    question: "I want to be a TEDxKings Square Women speaker. How do I do that?",
+    answer:
+      "Keep an eye on our social media pages for our Call for Speakers announcement, where you can apply to be considered as a TEDx speaker.",
+  },
+  {
+    question: "How can I join the TEDxKings Square Women community?",
+    answer:
+      "Join our WhatsApp community to stay up to date with event announcements, speaker reveals, and exclusive updates: https://chat.whatsapp.com/BpjkeQJOVHK7D3zacrlVGw",
+  },
+  {
+    question: "How can I partner with TEDxKings Square Women?",
+    answer:
+      "For partnership opportunities, please contact us via our official email: mailto:tedxkingssquarewomen@gmail.com or our social media pages.",
   },
 ] as const;
 

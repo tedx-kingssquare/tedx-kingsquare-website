@@ -31,14 +31,14 @@ const CORE_VALUES_ICONS: Record<(typeof CORE_VALUES)[number]["icon"], React.Comp
 };
 
 function renderHighlightedText(text: string) {
-  return text.split(/(\*\*.*?\*\*)/g).map((part, idx) => {
-    const isBold = part.startsWith("**") && part.endsWith("**");
-    if (!isBold) return <React.Fragment key={idx}>{part}</React.Fragment>;
-    return (
-      <strong key={idx} className="font-semibold text-brand-primary">
-        {part.slice(2, -2)}
-      </strong>
-    );
+  return text.split(/(\*\*.*?\*\*|https?:\/\/\S+|mailto:\S+)/g).map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**"))
+      return <strong key={idx} className="font-semibold text-brand-primary">{part.slice(2, -2)}</strong>;
+    if (part.startsWith("mailto:"))
+      return <a key={idx} href={part} className="text-brand-primary font-medium underline underline-offset-2 hover:opacity-80 transition">{part.slice(7)}</a>;
+    if (part.startsWith("http"))
+      return <a key={idx} href={part} target="_blank" rel="noopener noreferrer" className="text-brand-primary font-medium underline underline-offset-2 break-all hover:opacity-80 transition">{part}</a>;
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
   });
 }
 
@@ -626,7 +626,7 @@ export default function Home() {
                       }}
                       className="h-0 opacity-0 overflow-hidden"
                     >
-                      <div className="px-4 md:px-6 pb-4 md:pb-5 text-sm md:text-[15px] text-gray-2 font-normal space-y-3">
+                      <div className="px-4 md:px-6 pb-4 md:pb-5 text-sm md:text-[15px] text-gray-2 font-normal space-y-3 max-w-[80%]">
                         {renderFaqAnswer(item.answer)}
                       </div>
                     </div>
