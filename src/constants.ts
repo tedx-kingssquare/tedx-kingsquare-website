@@ -91,12 +91,76 @@ export const SPEAKERS_SECTION = {
   viewAll: { primary: "View All Speakers", secondary: "See everyone", href: "#speakers" },
 };
 
+// FAQ
+export const FAQ_SECTION = {
+  title: "Frequently Asked Questions",
+  cta: { label: "Contact Us", href: "/contact" },
+};
+
+export const FAQ_ITEMS = [
+  {
+    question: "What is TEDxKings Square Women?",
+    answer:
+      "TEDxKings Square Women is an independently organized TED event that showcases women's voices, women-led innovations, and ideas worth spreading through talks that inspire action and meaningful conversations.",
+  },
+  {
+    question: "How is a TEDx event different from a TED Conference?",
+    answer:
+      "TED Conferences are run by TED, while TEDx events are independently organized under a TED license, following the TED format, with the goal of sharing ideas worth spreading.",
+  },
+  {
+    question: "Is this event only for women?",
+    answer:
+      "No! It's open to ALL — women, men, youths, and women allies.",
+  },
+  {
+    question: "What age group is this for?",
+    answer:
+      "All ages! We believe powerful ideas have no age limit.",
+  },
+  {
+    question: "Why is it called TEDxKings Square Women?",
+    answer:
+      "Kings Square is the heart of Benin City, a central gathering place. We're creating a space where women's ideas take center stage.",
+  },
+  {
+    question: "Where will the event be held?",
+    answer:
+      "Benin City. Exact venue to be announced soon. Stay tuned!",
+  },
+  {
+    question: "When is the event?",
+    answer:
+      "Keep an eye on our social media for the big reveal. Coming soon!",
+  },
+  {
+    question: "How can I attend the event?",
+    answer:
+      "Tickets will be announced and made available through our website and official social media pages.",
+  },
+  {
+    question: "I want to be a TEDxKings Square Women speaker. How do I do that?",
+    answer:
+      "Keep an eye on our social media pages for our Call for Speakers announcement, where you can apply to be considered as a TEDx speaker.",
+  },
+  {
+    question: "How can I join the TEDxKings Square Women community?",
+    answer:
+      "Join our WhatsApp community to stay up to date with event announcements, speaker reveals, and exclusive updates: https://chat.whatsapp.com/BpjkeQJOVHK7D3zacrlVGw",
+  },
+  {
+    question: "How can I partner with TEDxKings Square Women?",
+    answer:
+      "For partnership opportunities, please contact us via our official email: mailto:tedxkingssquarewomen@gmail.com or our social media pages.",
+  },
+] as const;
+
 // Partnership
 export const PARTNERS_SECTION = {
   title: "Become a TEDx Kings Square Women Partner Today",
   brandName: "TEDx",
   body: "We welcome organizations and individuals who share our vision. Partner with us to support this year's event and connect with a growing community of changemakers.",
-  cta: { primary: "Join Partners", secondary: "Partner with us", href: "#contact" },
+  cta: { primary: "Join Partners", secondary: "Partner with us", href: "/contact" },
 };
 
 // Ready to be Inspired
@@ -104,7 +168,7 @@ export const INSPIRED_SECTION = {
   title: "Ready to be Inspired?",
   body: "Don't miss this opportunity to connect with extraordinary women and groundbreaking ideas.",
   ctas: [
-    { primary: "Get Your Ticket", secondary: "Reserve now", href: "#", id: "register" },
-    { primary: "Join Our Community", secondary: "Connect now", href: "#contact" },
+    { primary: "Get Your Ticket", secondary: "Reserve now", href: "/event#tickets", id: "register" },
+    { primary: "Join Our Community", secondary: "Connect now", href: "https://chat.whatsapp.com/BpjkeQJOVHK7D3zacrlVGw" },
   ],
 };
