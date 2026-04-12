@@ -18,6 +18,8 @@ import {
   CORE_VALUES_SECTION,
   EVENT_DETAILS,
   SPEAKERS_SECTION,
+  FAQ_SECTION,
+  FAQ_ITEMS,
   PARTNERS_SECTION,
   INSPIRED_SECTION,
 } from "../constants";
@@ -27,6 +29,57 @@ const CORE_VALUES_ICONS: Record<(typeof CORE_VALUES)[number]["icon"], React.Comp
   SquaresIntersect,
   Waves,
 };
+
+function renderHighlightedText(text: string) {
+  return text.split(/(\*\*.*?\*\*|https?:\/\/\S+|mailto:\S+)/g).map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**"))
+      return <strong key={idx} className="font-semibold text-brand-primary">{part.slice(2, -2)}</strong>;
+    if (part.startsWith("mailto:"))
+      return <a key={idx} href={part} className="text-brand-primary font-medium underline underline-offset-2 hover:opacity-80 transition">{part.slice(7)}</a>;
+    if (part.startsWith("http"))
+      return <a key={idx} href={part} target="_blank" rel="noopener noreferrer" className="text-brand-primary font-medium underline underline-offset-2 break-all hover:opacity-80 transition">{part}</a>;
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+}
+
+function renderFaqAnswer(answer: string) {
+  const lines = answer.split("\n").map((line) => line.trim());
+  const items: React.ReactNode[] = [];
+  let bulletBuffer: string[] = [];
+
+  const flushBullets = () => {
+    if (!bulletBuffer.length) return;
+    items.push(
+      <ul key={`bullets-${items.length}`} className="list-disc pl-5 space-y-1.5 marker:text-gray-8">
+        {bulletBuffer.map((bullet, idx) => (
+          <li key={idx} className="leading-relaxed">
+            {renderHighlightedText(bullet)}
+          </li>
+        ))}
+      </ul>
+    );
+    bulletBuffer = [];
+  };
+
+  lines.forEach((line) => {
+    if (!line) {
+      flushBullets();
+      return;
+    }
+    if (line.startsWith("- ")) {
+      bulletBuffer.push(line.slice(2));
+      return;
+    }
+    flushBullets();
+    items.push(
+      <p key={`p-${items.length}`} className="leading-relaxed">
+        {renderHighlightedText(line)}
+      </p>
+    );
+  });
+  flushBullets();
+  return items;
+}
 
 function CoreValuesGrid() {
   return (
@@ -55,6 +108,7 @@ function CoreValuesGrid() {
 
 export default function Home() {
   const [email, setEmail] = useState("");
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const heroSectionRef = useRef<HTMLElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
   const heroImageInnerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +125,7 @@ export default function Home() {
   const speakersSectionRef = useRef<HTMLElement>(null);
   const partnersSectionRef = useRef<HTMLElement>(null);
   const inspiredSectionRef = useRef<HTMLElement>(null);
+  const faqContentRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   useEffect(() => {
     const section = heroSectionRef.current;
@@ -220,26 +275,16 @@ export default function Home() {
     const section = speakersSectionRef.current;
     if (!section) return;
     const ctx = gsap.context(() => {
-      const grid = section.querySelector('[class*="grid"]');
-      if (!grid) return;
-      const cards = grid.children;
-      if (!cards.length) return;
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 32 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 60%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
+      const label = section.querySelector("[data-speaker-label]");
+      const cards = section.querySelectorAll("[data-speaker-body]:first-of-type > div");
+      const cta = section.querySelector("[data-speaker-body]:last-of-type");
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: section, start: "top 70%", toggleActions: "play none none none" },
+        defaults: { ease: "power2.out" },
+      });
+      if (label) tl.fromTo(label, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5 });
+      if (cards.length) tl.fromTo(cards, { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.07 }, "-=0.2");
+      if (cta) tl.fromTo(cta, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3");
     }, section);
     return () => ctx.revert();
   }, []);
@@ -279,6 +324,34 @@ export default function Home() {
     }, section);
     return () => ctx.revert();
   }, []);
+
+  useEffect(() => {
+    faqContentRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const isOpen = activeFaq === idx;
+      if (isOpen) {
+        gsap.killTweensOf(el);
+        gsap.set(el, { display: "block" });
+        gsap.to(el, {
+          height: el.scrollHeight,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+          onComplete: () => {
+            gsap.set(el, { height: "auto" });
+          },
+        });
+      } else {
+        gsap.killTweensOf(el);
+        gsap.to(el, {
+          height: 0,
+          opacity: 0,
+          duration: 0.3,
+          ease: "power2.inOut",
+        });
+      }
+    });
+  }, [activeFaq]);
 
   return (
     <div className="flex flex-col">
@@ -362,7 +435,8 @@ export default function Home() {
                   <p key={i}>{p}</p>
                 ))}
               </div>
-              <button
+              <a
+                href="/about"
                 className="cta-text-swap inline-flex items-center justify-center mt-[29px] w-[96px] h-[48px] rounded-md bg-brand-white text-gray-1 font-['Helvetica']! text-[16px] leading-[24px] font-medium tracking-[-0.5%] border border-gray-11 hover:opacity-90 transition"
               >
                 <span className="cta-text-swap__inner">
@@ -371,7 +445,7 @@ export default function Home() {
                     <span className="cta-text-swap__line" aria-hidden>{ABOUT.cta.secondary}</span>
                   </span>
                 </span>
-              </button>
+              </a>
             </div>
           </div>
         </section>
@@ -450,49 +524,125 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Speakers */}
+        {/* Featured Speakers — Coming Soon */}
         <section ref={speakersSectionRef} id="speakers" className="py-10 sm:py-12 md:py-16 lg:py-20 xl:py-24 bg-gray-12">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px]">
-            <h2 className="font-heading text-2xl md:text-[40px] md:leading-[48px] font-bold text-brand-black text-center mb-10 md:mb-20">
+            <h2 data-speaker-label className="font-heading text-2xl md:text-[40px] md:leading-[48px] font-bold text-brand-black text-center mb-10 md:mb-20">
               {SPEAKERS_SECTION.title}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-              {SPEAKERS.map((speaker) => (
-                <div
-                  key={speaker.name}
-                  className="bg-white rounded-xl overflow-hidden text-center h-[380px] sm:h-[340px] md:h-[400px] lg:h-[438px] flex flex-col border border-[#C1C1C1]"
-                >
-                  <div className="w-full flex-1 min-h-0 relative bg-gray-200">
-                    <Image
-                      src={speaker.image}
-                      alt={speaker.name}
-                      fill
-                      className="object-cover object-top"
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                    />
-                  </div>
-                  <div className="p-3 md:p-4 shrink-0">
-                    <h3 className="font-sans font-semibold text-[13px] md:text-[16px] text-brand-black mb-1 md:mb-2">
-                      {speaker.name}
-                    </h3>
-                    <p className="font-sans text-[12px] md:text-[14px] text-gray-9">
-                      {speaker.role}
-                    </p>
+            {/* Mystery speaker grid */}
+            <div data-speaker-body className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-5 w-full">
+              {SPEAKERS.slice(0, 4).map((_, idx) => (
+                <div key={idx} className="group cursor-pointer" style={{ perspective: '1000px' }}>
+                  {/* Flipper */}
+                  <div className="relative w-full [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] transition-transform duration-500 ease-in-out">
+                    {/* Front */}
+                    <div className="[backface-visibility:hidden] flex flex-col bg-white rounded-2xl p-3 md:p-4 shadow-[0_2px_20px_rgba(0,0,0,0.07)]">
+                      <div className="relative aspect-[1/1] rounded-xl bg-[#EFEFEF] overflow-hidden">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="#C8C8C8"
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[52%]"
+                          aria-hidden
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                        </svg>
+                      </div>
+                      <div className="mt-3 px-1 flex flex-col gap-[10px]">
+                        <div className="h-[13px] bg-gray-300 rounded-full w-[68%]" aria-hidden />
+                        <div className="h-[10px] bg-gray-200 rounded-full w-[45%]" aria-hidden />
+                      </div>
+                    </div>
+                    {/* Back */}
+                    <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col items-center justify-center bg-[#E2E2E2] rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.07)]">
+                      <span className="font-heading font-black text-brand-primary leading-none select-none" style={{ fontSize: 'clamp(48px, 6vw, 72px)' }}>?</span>
+                      <p className="font-heading text-gray-500 text-xs mt-3 tracking-widest uppercase">Coming Soon</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="text-center mt-12 md:mt-14">
+
+            {/* CTA */}
+            <div data-speaker-body className="mt-10 md:mt-14 flex flex-col items-center gap-4 text-center">
+              <p className="font-heading text-[16px] md:text-[18px] leading-[26px] text-gray-2 max-w-[480px]">
+                Our lineup of extraordinary women is being curated. Follow us to be the first to know when speakers are revealed.
+              </p>
               <a
-                href={SPEAKERS_SECTION.viewAll.href}
-                className="cta-text-swap inline-flex items-center justify-center font-sans font-medium text-[24px] text-brand-primary hover:underline"
+                href="https://www.instagram.com/tedxkingssquarewomen"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cta-text-swap inline-flex items-center justify-center gap-2 bg-brand-primary text-white px-6 py-3 rounded-md font-heading font-medium text-[16px] leading-[24px] hover:opacity-90 transition"
               >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 shrink-0" aria-hidden>
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                </svg>
                 <span className="cta-text-swap__inner">
                   <span className="cta-text-swap__track">
-                    <span className="cta-text-swap__line">{SPEAKERS_SECTION.viewAll.primary}</span>
-                    <span className="cta-text-swap__line" aria-hidden>{SPEAKERS_SECTION.viewAll.secondary}</span>
+                    <span className="cta-text-swap__line">Follow for updates</span>
+                    <span className="cta-text-swap__line" aria-hidden>@tedxkingssquarewomen</span>
                   </span>
                 </span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-12 sm:py-16 md:py-20 bg-white">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px]">
+            <h2 className="font-heading font-bold text-brand-black text-2xl md:text-4xl text-center mb-8 md:mb-12">
+              {FAQ_SECTION.title}
+            </h2>
+            <div className="max-w-[980px] mx-auto space-y-3 md:space-y-4">
+              {FAQ_ITEMS.map((item, idx) => {
+                const isOpen = activeFaq === idx;
+                return (
+                  <div
+                    key={item.question}
+                    className="rounded-md bg-[#F9F9F9] text-brand-black overflow-hidden"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveFaq(isOpen ? null : idx)}
+                      className="w-full cursor-pointer text-left px-4 md:px-6 py-4 md:py-5 flex items-center justify-between gap-4"
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-panel-${idx}`}
+                    >
+                      <span className="font-heading text-[14px] md:text-[16px] leading-[22px] font-semibold text-[#191919]">
+                        {item.question}
+                      </span>
+                      <span className="shrink-0 text-lg leading-none text-gray-1">
+                        {isOpen ? "−" : "+"}
+                      </span>
+                    </button>
+                    <div
+                      id={`faq-panel-${idx}`}
+                      ref={(el) => {
+                        faqContentRefs.current[idx] = el;
+                      }}
+                      className="h-0 opacity-0 overflow-hidden"
+                    >
+                      <div className="px-4 md:px-6 pb-4 md:pb-5 text-sm md:text-[15px] text-gray-2 font-normal space-y-3 max-w-[80%]">
+                        {renderFaqAnswer(item.answer)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-center text-[13px] md:text-[14px] text-gray-1 mt-8">
+              Still have questions? We&apos;re here to help.
+            </p>
+            <div className="text-center mt-4">
+              <a
+                href={FAQ_SECTION.cta.href}
+                className="inline-flex items-center justify-center h-9 px-4 rounded border border-gray-11 text-gray-1 text-[12px] hover:bg-white/40 transition"
+              >
+                {FAQ_SECTION.cta.label}
               </a>
             </div>
           </div>

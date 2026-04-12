@@ -9,7 +9,7 @@ import { gsap } from "gsap";
 
 const NAV_LINKS = [
   { label: "Home", href: "/", id: "home" },
-  { label: "About", href: "/#about", id: "about" },
+  { label: "About", href: "/about", id: "about" },
   { label: "Event", href: "/event", id: "event" },
   { label: "Contact", href: "/contact", id: "contact" },
 ];
@@ -21,7 +21,7 @@ export default function Navbar({ activePage: activePageProp }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuIconError, setMenuIconError] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const activePage = activePageProp ?? (pathname === "/event" ? "event" : pathname === "/contact" ? "contact" : "home");
+  const activePage = activePageProp ?? (pathname === "/event" ? "event" : pathname === "/about" ? "about" : pathname === "/contact" ? "contact" : "home");
 
   useEffect(() => {
     const header = headerRef.current;
@@ -40,12 +40,15 @@ export default function Navbar({ activePage: activePageProp }: NavbarProps) {
     <header ref={headerRef} className="fixed w-full left-0 top-0 z-50 bg-white">
       <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[100px]">
         <div className="flex items-center justify-between py-4">
-          <Link href="/" className="flex items-center shrink-0">
+          <Link href="/" className="flex flex-col items-start shrink-0">
             <img
               src="/logo-black.png"
               alt="TEDx Kings Square Women"
               className="h-9 md:h-10 w-auto object-contain"
             />
+            <span className="font-sans text-[10px] md:text-[11px] text-gray-500 leading-tight mt-0.5">
+              <span className="text-red-600 font-medium">x</span> = independently organized TED event
+            </span>
           </Link>
           <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-10">
             {NAV_LINKS.map((link) => (
